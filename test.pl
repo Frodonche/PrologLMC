@@ -17,10 +17,24 @@ echo(_).
 
 % CODE TROUVE POUR TEST
 
+% Facts
 food(burger).
 food(sandwich).
 food(pizza).
 lunch(sandwich).
 dinner(pizza).
 
+% Rules
 meal(X) :- food(X).
+
+% Queries & answers
+?- food(pizza).
+true.
+
+?- meal(X), lunch(X).
+X = sandwich.
+
+% Le . est l'equivalent du ; en java. Il est indispensable a la fin de chaque ligne, que ce soit dans le programme ou quand on pose des questions dans la console.
+% Remarque sur meal(X) et food(X) : 
+% Quand on met X au niveau d'une rule, osef que ce soit X, w ou n'importe quelle autre lettre (exemple plus haut avec echo)
+% Par contre, quand on pose la question dans la console (Query), le X est obligatoire, sinon ca marche pas.
