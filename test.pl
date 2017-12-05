@@ -14,6 +14,9 @@ clr_echo :- retractall(echo_on).
 echo(T) :- echo_on, !, write(T).
 echo(_).
 
+% menu : ce predicat va set_echo, puis echo un menu d'accueil
+menu :- set_echo, echo('LMC UNIFICATION PROGRAM'), nl, echo('Option 1 : ça c est l option 1 tavu'), nl, echo('Option 2 : et ça c est l option 2 mdr').
+
 
 % CODE TROUVE POUR TEST
 
@@ -27,12 +30,13 @@ dinner(pizza).
 % Rules
 meal(X) :- food(X).
 
-% Queries & answers
-?- food(pizza).
-true.
 
-?- meal(X), lunch(X).
-X = sandwich.
+% Queries & answers
+% ?- food(pizza).
+% true.
+
+% ?- meal(X), lunch(X).
+% X = sandwich.
 
 % Le . est l'equivalent du ; en java. Il est indispensable a la fin de chaque ligne, que ce soit dans le programme ou quand on pose des questions dans la console.
 % Remarque sur meal(X) et food(X) : 
