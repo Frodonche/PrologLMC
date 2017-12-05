@@ -11,3 +11,4 @@ Liens utiles
 - http://athena.ecs.csus.edu/~logicp/prolog/programming-examples.html
 - http://www.swi-prolog.org/pldoc/man?section=cpp-examples
 - http://www.swi-prolog.org/pldoc/doc_for?object=root
+- http://www.swi-prolog.org/pldoc/man?section=typetest
