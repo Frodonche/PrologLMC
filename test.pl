@@ -38,3 +38,5 @@ X = sandwich.
 % Remarque sur meal(X) et food(X) : 
 % Quand on met X au niveau d'une rule, osef que ce soit X, w ou n'importe quelle autre lettre (exemple plus haut avec echo)
 % Par contre, quand on pose la question dans la console (Query), le X est obligatoire, sinon ca marche pas.
+
+%Quand la réponse d'une requete ne se termine pas toute seule, il faut appuyer sur espace pour avoir le résultat complet.
