@@ -33,9 +33,14 @@ init :- menu.
 
 :- init.
 
-
 % Definition de l'operateur fourni
 :- op(20, xfy, =?).
+
+
+% Question 1 : partie unification
+
+% Definition de regle(E,R)
+
 
 
 % Ne pas utiliser de liste pour les arguments de fonctions f(x,y) -> [f,x,y] A NE PAS FAIRE
