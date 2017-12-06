@@ -25,8 +25,7 @@ ansi_format([fg(red)], '   MARTELLI - MONTANARI', []), nl,
 ansi_format([fg(red)], '   UNIFICATION PROGRAM', []), nl, nl,
 ansi_format([fg(green)], '- menu : afficher ce menu', []), nl,
 ansi_format([fg(green)], '- toto : blabla oui oui', []), nl,
-ansi_format([fg(blue)], '=============================', []), nl, nl,
-echo('onche').
+ansi_format([fg(blue)], '=============================', []), nl, nl.
 
 % init : sera éxécuté dès le lancement du programme
 init :- menu.
@@ -34,13 +33,18 @@ init :- menu.
 :- init.
 
 % Definition de l'operateur fourni
-:- op(20, xfy, =?).
+:- op(20, xfy, =?). 
 
 
 % Question 1 : partie unification
 
-% Definition de regle(E,R)
+% Definition de regle(E, R)
+% Definition des regles de transformation
+% Definition de Rename
+regle(X ?= T, rename) :- var(X), var(T).
 
+%Definition de Simplify
+regle(X ?= T, simplify) :- var(X), atom(T).
 
 
 % Ne pas utiliser de liste pour les arguments de fonctions f(x,y) -> [f,x,y] A NE PAS FAIRE
