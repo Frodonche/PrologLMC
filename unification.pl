@@ -1,7 +1,7 @@
 :- op(20, xfy, ?=).
 :- encoding(utf8).
 
-% Prédicats d'affichage fournis
+% Prédicats d'affichage fournis'
 % set_echo: ce prédicat active l'affichage par le prédicat echo
 set_echo :- assert(echo_on).
 
@@ -112,7 +112,7 @@ unification(P, Strat, o) :- trace_unif(P, Strat).
 unification(P, Strat, _) :- unif(P, Strat).
 
 % Applique l’algorithme d’unification sur le liste P
-% Permet de choisir la stratégie ainsi que l'affichage ou non de la trace
+% Permet de choisir la stratégie ainsi que l'affichage ou non de la trace'
 % Stratégie 'premier' par défaut.
 unifier(P) :-
     write('Choix stratégie :'), nl,

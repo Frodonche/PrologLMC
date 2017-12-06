@@ -1,3 +1,6 @@
+% Encodage en UTF-8
+:- encoding(utf8).
+
 % Prédicats d'affichage fournis
 
 % set_echo: ce prédicat active l'affichage par le prédicat echo
@@ -15,14 +18,25 @@ echo(_).
 % Predicats d'affichage custom
 
 % menu : ce predicat va set_echo, puis echo un menu d'accueil
-menu :- set_echo,
-echo('========================================='), nl,
-echo('LMC UNIFICATION PROGRAM'), nl, 
-echo('Option 1 : ça c est l option 1 tavu'), nl, 
-echo('Option 2 : et ça c est l option 2 mdr'), nl,
-echo('========================================='), nl.
+menu :- 
+set_echo, nl,
+ansi_format([fg(blue)], '=============================', []), nl,
+ansi_format([fg(red)], '   MARTELLI - MONTANARI', []), nl,
+ansi_format([fg(red)], '   UNIFICATION PROGRAM', []), nl, nl,
+ansi_format([fg(green)], '- menu : afficher ce menu', []), nl,
+ansi_format([fg(green)], '- toto : blabla oui oui', []), nl,
+ansi_format([fg(blue)], '=============================', []), nl, nl,
+echo('onche').
 
 % init : sera éxécuté dès le lancement du programme
 init :- menu.
 
 :- init.
+
+
+% Definition de l'operateur fourni
+:- op(20, xfy, =?).
+
+
+% Ne pas utiliser de liste pour les arguments de fonctions f(x,y) -> [f,x,y] A NE PAS FAIRE
+% Utiliser functor et arg a la place 
