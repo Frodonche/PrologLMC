@@ -43,8 +43,10 @@ init :- menu.
 % Definition de Rename
 regle(X ?= T, rename) :- var(X), var(T).
 
-%Definition de Simplify
+% Definition de Simplify
 regle(X ?= T, simplify) :- var(X), atom(T).
+
+% Definition de Compound
 
 
 % Ne pas utiliser de liste pour les arguments de fonctions f(x,y) -> [f,x,y] A NE PAS FAIRE
