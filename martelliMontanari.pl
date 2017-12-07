@@ -33,10 +33,16 @@ init :- menu.
 :- init.
 
 % Definition de l'operateur fourni
-:- op(20, xfy, =?). 
+:- op(20, xfy, ?=). 
 
 
 % Question 1 : partie unification
+
+% Definition de occur_check
+occur_check(X, T) :- var(X), contains_var(X, T).
+% Le var(X) est peut-etre inutile dans le cas présent car lorsqu'on appelle occur_check, on a déjà testé si X est une variable.
+% On le garde pour une définition plus rigoureuse, vu que peu couteux.
+
 
 % Definition de regle(E, R)
 % Definition des regles de transformation
@@ -47,7 +53,19 @@ regle(X ?= T, rename) :- var(X), var(T).
 regle(X ?= T, simplify) :- var(X), atom(T).
 
 % Definition de Expand
-# regle(X ?= T, expand) :- var(X), compound(T), \+
+regle(X ?= T, expand) :- var(X), compound(T), \+(occur_check(X, T)).
+
+% Definition de Check
+regle(X ?= T, check) :- var(X), X \== T, occur_check(X, T).
+
+% Definition de Orient
+regle(T ?= X, orient) :- var(X), \+(var(T)).
+
+% Definition de Decompose
+regle(F ?= G, decompose) :- \+(var(F)), \+(var(G)), functor(F, Ff, Fn), functor(G, Gf, Gn), Ff == Gf, Fn =:= Gn.
+
+% Definition de Clash
+regle(F ?= G, clash) :- \+(var(F)); \+(var(G)), functor(F, Ff, Fn), functor(G, Gf, Gn), (Ff \== Gf; Fn =\= Gn), !.
 
 
 % Ne pas utiliser de liste pour les arguments de fonctions f(x,y) -> [f,x,y] A NE PAS FAIRE
