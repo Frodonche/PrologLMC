@@ -46,7 +46,8 @@ regle(X ?= T, rename) :- var(X), var(T).
 % Definition de Simplify
 regle(X ?= T, simplify) :- var(X), atom(T).
 
-% Definition de Compound
+% Definition de Expand
+# regle(X ?= T, expand) :- var(X), compound(T), \+
 
 
 % Ne pas utiliser de liste pour les arguments de fonctions f(x,y) -> [f,x,y] A NE PAS FAIRE
