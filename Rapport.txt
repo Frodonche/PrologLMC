@@ -1,8 +1,8 @@
 Rapport TP LMC - Paul DECANTER & Guillaume ROTH
 
-Implémentation de occur_check(V,T) :
-Nous avons trouvé une fonction qui effectue la même opération que celle que nous destinions à occur_check, à savoir contains_var(V,T).
-C'est pourquoi nous avons défini occur_check comme étant l'éxécution de contains_var.
+Implémentation de occur_check(X,T) :
+Nous avons trouvé une fonction qui effectue la même opération que celle que nous destinions à occur_check, à savoir contains_var(X,T).
+C'est pourquoi nous avons défini occur_check comme étant l'éxécution de contains_var, après vérification que X est bien une variable.
 
 Note sur xfy dans la définition de l'opérateur fourni :
 xfy signifie qu il y a quelque chose avant et apres l operateur
@@ -10,12 +10,21 @@ xfy signifie qu il y a quelque chose avant et apres l operateur
 Note sur les opérateurs :
 \+ = négation
 _ = null
-\== différent
-
+\== different (en terme d'équivalence d'expression)
+=\= different (en terme de valeur)
+, entre les clauses : et 
+; entre les clauses : ou
+! pour le cut, mais peut servir pour simuler bottom
 
 Définition de simplify :
 regle(X ?= T, simplify) :- var(X), atom(T).
 Nous avons utilisé atom(T), car simplify fonctionne seulement si T est une constante. 
 Hors, atom(T) retourne vrai seulement si T est lié à un atome.
 
-ajoout test
+Définition de decompose :
+Ff == Gf pour comparer l'équivalence sémantique des fonctions, et Fn =:= Gn pour comparer que la valeur de leur arité est bien identique (pour avoir autant de s_n que de t_n (ref. enoncé))
+
+Definition de clash : 
+Même chose que pour decompose, mais les egalites se transforment en differences.
+On recupere toujours les fonctions avec functor, mais les verifications sont maintenant Ff \== Gf et Fn =\= Gn.
+ 
