@@ -68,5 +68,32 @@ regle(F ?= G, decompose) :- \+(var(F)), \+(var(G)), functor(F, Ff, Fn), functor(
 regle(F ?= G, clash) :- \+(var(F)); \+(var(G)), functor(F, Ff, Fn), functor(G, Gf, Gn), (Ff \== Gf; Fn =\= Gn), !.
 
 
-% Ne pas utiliser de liste pour les arguments de fonctions f(x,y) -> [f,x,y] A NE PAS FAIRE
-% Utiliser functor et arg a la place 
+% Definition du predicat d'unification de E avec la liste passée en paramètre, 
+suppr(E, [T|Q], S) :- E \== T, append([T], V, S), suppr(E, Q, V), !.
+suppr(E, [T|Q], S) :- E == T, suppr(E, Q, S).
+suppr(_, [], []).
+
+% Definition du predicat de suppression de la tete de liste
+suppr_T([_|Q], Q).
+suppr_T([], []).
+
+% Definition du predicat d'unification de deux listes.
+% On unifie la tete de L1 avec celle de L2, puis on fait un appel récursif.
+unif_list([T1|Q1], [T2|Q2], L) :- append([T1 ?= T2], V, L), unif_list(Q1, Q2, L2).
+unif_list([], [], []).
+
+
+% Definition de reduit(R,E,P,S) (avec S = Q de l'enonce)
+reduit(rename, X ?= T, P, S) :- suppr(X ?= T, P, S), X = T.
+reduit(simplify, X ?= T, P, S) :- suppr(X ?= T, P, S), X = T.
+reduit(expand, X ?= T, P, S) :- suppr(X ?= T, P, S), X = T.
+reduit(check, _, _, []) :- false.
+reduit(orient, T ?= X, P, S) :- suppr(T ?= X, P, S2), append([X ?= T], S2, S).
+reduit(decompose, F ?= G, P, S) :- 	F =.. Fliste, G =.. Gliste, 
+									suppr_T(Fliste, Freste), suppr_T(Gliste, Greste),
+									unif_list(Fliste, Gliste, L),
+									suppr(F ?= G, P, V),
+									append(L, V, S).
+
+
+% Question 2 : Definition des strategies
