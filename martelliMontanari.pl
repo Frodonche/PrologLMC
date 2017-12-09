@@ -15,6 +15,7 @@ clr_echo :- retractall(echo_on).
 echo(T) :- echo_on, !, write(T).
 echo(_).
 
+
 % ---------------------------------------------------------------------------
 
 % Definition de l'operateur fourni
@@ -22,7 +23,7 @@ echo(_).
 
 % ---------------------------------------------------------------------------
 
-% Question 1 : partie unification
+% Partie unification
 
 % Definition de occur_check
 occur_check(X, T) :- var(X), contains_var(X, T).
@@ -48,10 +49,14 @@ regle(X ?= T, check) :- var(X), X \== T, occur_check(X, T).
 regle(T ?= X, orient) :- var(X), nonvar(T).
 
 % Definition de Decompose
-regle(F ?= G, decompose) :- nonvar(F), nonvar(G), functor(F, Ff, Fn), functor(G, Gf, Gn), Ff == Gf, Fn =:= Gn.
+regle(F ?= G, decompose) :- nonvar(F), nonvar(G), 
+							functor(F, Ff, Fn), functor(G, Gf, Gn), 
+							Ff == Gf, Fn =:= Gn.
 
 % Definition de Clash
-regle(F ?= G, clash) :- nonvar(F); nonvar(G), functor(F, Ff, Fn), functor(G, Gf, Gn), (Ff \== Gf; Fn =\= Gn), !.
+regle(F ?= G, clash) :- nonvar(F); nonvar(G), 
+						functor(F, Ff, Fn), functor(G, Gf, Gn), 
+						(Ff \== Gf; Fn =\= Gn), !.
 
 
 % Definition du predicat d'unification de E avec la liste passée en paramètre, 
@@ -73,18 +78,18 @@ unif_list([], [], []).
 reduit(rename, X ?= T, P, S) :- suppr(X ?= T, P, S), X = T.
 reduit(simplify, X ?= T, P, S) :- suppr(X ?= T, P, S), X = T.
 reduit(expand, X ?= T, P, S) :- suppr(X ?= T, P, S), X = T.
+reduit(check, _, _, []) :- false.
 reduit(orient, T ?= X, P, S) :- suppr(T ?= X, P, S2), append([X ?= T], S2, S).
 reduit(decompose, F ?= G, P, S) :- 	F =.. Fliste, G =.. Gliste, 
 									suppr_T(Fliste, Freste), suppr_T(Gliste, Greste),
 									unif_list(Freste, Greste, L),
 									suppr(F ?= G, P, V),
 									append(L, V, S).
-reduit(check, _, _, []) :- false.
 reduit(clash, _, _, []) :- false.
 									
 % ---------------------------------------------------------------------------
 								
-% Question 2 : Definition des strategies
+% Definition des strategies
 
 % Definition du predicat unifie
 unifier([], _).
@@ -98,7 +103,8 @@ choix(premier, P, E, R) :- choix_premier(P, E, R).
 choix(pondere, P, E, R) :- choix_pondere(P, E, R).
 
 % Definition de la liste ordonnee des regles representant l'echelle de poids
-echelle_poids([clash, check, rename, simplify, orient, decompose, expand]).
+ echelle_poids([check, rename, simplify, orient, decompose, expand, clash]).
+% echelle_poids([expand, decompose, orient, simplify, rename, check, clash]).
 
 % Definition du predicat trouver_equation qui se charge de trouver une equation sur laquelle on peut appliquer une regle, et d'y appliquer la regle correspondante
 trouver_equation([R|_], [E|_], E, R) :- regle(E, R).
@@ -136,19 +142,31 @@ ansi_format([fg(blue)], '===============================================', []), 
 % afficher trace : affiche l'etat courant du programme
 afficher_trace(R, E, S) :-	echo('System : '), echo(S), nl,
 							echo(R), echo(' : '), echo(E), nl.
-		
+
+							
+% Predicats pour lancer l'unification avec ou non l'affichage de la trace
+trace_unif(P, Strategie) :- set_echo, unifier(P, Strategie).	
+unif(P, Strategie) :- clr_echo, unifier(P, Strategie).
+						
+							
+% Appel des predicats pour l'affichage ou non de la trace en fonction du choix utilisateur							
+unifier_trace(P, Strategie, oui) :- trace_unif(P, Strategie).
+unifier_trace(P, Strategie, _) :- unif(P, Strategie).
+							
 % affichage et choix de la strategie a appliquer
 % strategie premier par defaut
 unifie(P) :- 	echo('Choisissez une strategie : '), nl,
 				echo('(a) Premier'), nl,
 				echo('(b) Pondere'), nl,
-				read(numStrat), (numStrat == a -> Strategie = premier ;
-								numStrat == b -> Strategie = pondere;
-								Strategie = premier), 
-				ansi_format([fg(yellow)], 'Stratégie : ~w', [Strategie]), nl,				
-				
-				unifier(P, Strategie).
-		% echo('Strategie : '), echo(numStrat), nl,
+				read(NumStrat),
+				(NumStrat == a -> Strategie = premier ;
+								NumStrat == b -> Strategie = pondere;
+								Strategie = premier),
+				echo('Strategie choisie : '), echo(Strategie), nl,	
+				echo('Activer la trace d\'affichage des règles ? (oui/non)'), nl,
+				read(Activer), nl,
+				echo('Trace activee : '), echo(Activer), nl,
+				unifier_trace(P, Strategie, Activer).
 % ---------------------------------------------------------------------------
 							
 % init : sera éxécuté dès le lancement du programme
