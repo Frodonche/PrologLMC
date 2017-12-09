@@ -15,6 +15,7 @@ _ = null
 , entre les clauses : et 
 ; entre les clauses : ou
 ! pour le cut, mais peut servir pour simuler bottom
+[T|Q] : une liste avec T la tête et Q la queue (= le reste)
 
 Définition de simplify :
 regle(X ?= T, simplify) :- var(X), atom(T).
@@ -27,4 +28,11 @@ Ff == Gf pour comparer l'équivalence sémantique des fonctions, et Fn =:= Gn po
 Definition de clash : 
 Même chose que pour decompose, mais les egalites se transforment en differences.
 On recupere toujours les fonctions avec functor, mais les verifications sont maintenant Ff \== Gf et Fn =\= Gn.
- 
+! (cut) est utilisé pour simuler le bottom. En effet, si on tombe sur le cut, on arrête de chercher à utiliser la règle.
+
+Definition de reduit(decompose, ....) :
+On créé les listes Fliste et Gliste à partir de F et de G
+On unifie les têtes des listes
+On unifie les termes des deux listes 
+On unifie les équations des deux listes
+On append les termes et les equations pour creer le systeme resultant (append)
