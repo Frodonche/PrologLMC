@@ -15,26 +15,12 @@ clr_echo :- retractall(echo_on).
 echo(T) :- echo_on, !, write(T).
 echo(_).
 
-% Predicats d'affichage custom
-
-% menu : ce predicat va set_echo, puis echo un menu d'accueil
-menu :- 
-set_echo, nl,
-ansi_format([fg(blue)], '=============================', []), nl,
-ansi_format([fg(red)], '   MARTELLI - MONTANARI', []), nl,
-ansi_format([fg(red)], '   UNIFICATION PROGRAM', []), nl, nl,
-ansi_format([fg(green)], '- menu : afficher ce menu', []), nl,
-ansi_format([fg(green)], '- toto : blabla oui oui', []), nl,
-ansi_format([fg(blue)], '=============================', []), nl, nl.
-
-% init : sera éxécuté dès le lancement du programme
-init :- menu.
-
-:- init.
+% ---------------------------------------------------------------------------
 
 % Definition de l'operateur fourni
 :- op(20, xfy, ?=). 
 
+% ---------------------------------------------------------------------------
 
 % Question 1 : partie unification
 
@@ -59,13 +45,13 @@ regle(X ?= T, expand) :- var(X), compound(T), \+(occur_check(X, T)).
 regle(X ?= T, check) :- var(X), X \== T, occur_check(X, T).
 
 % Definition de Orient
-regle(T ?= X, orient) :- var(X), \+(var(T)).
+regle(T ?= X, orient) :- var(X), nonvar(T).
 
 % Definition de Decompose
-regle(F ?= G, decompose) :- \+(var(F)), \+(var(G)), functor(F, Ff, Fn), functor(G, Gf, Gn), Ff == Gf, Fn =:= Gn.
+regle(F ?= G, decompose) :- nonvar(F), nonvar(G), functor(F, Ff, Fn), functor(G, Gf, Gn), Ff == Gf, Fn =:= Gn.
 
 % Definition de Clash
-regle(F ?= G, clash) :- \+(var(F)); \+(var(G)), functor(F, Ff, Fn), functor(G, Gf, Gn), (Ff \== Gf; Fn =\= Gn), !.
+regle(F ?= G, clash) :- nonvar(F); nonvar(G), functor(F, Ff, Fn), functor(G, Gf, Gn), (Ff \== Gf; Fn =\= Gn), !.
 
 
 % Definition du predicat d'unification de E avec la liste passée en paramètre, 
@@ -79,7 +65,7 @@ suppr_T([], []).
 
 % Definition du predicat d'unification de deux listes.
 % On unifie la tete de L1 avec celle de L2, puis on fait un appel récursif.
-unif_list([T1|Q1], [T2|Q2], L) :- append([T1 ?= T2], V, L), unif_list(Q1, Q2, L2).
+unif_list([T1|Q1], [T2|Q2], L) :- append([T1 ?= T2], V, L), unif_list(Q1, Q2, V).
 unif_list([], [], []).
 
 
@@ -87,13 +73,85 @@ unif_list([], [], []).
 reduit(rename, X ?= T, P, S) :- suppr(X ?= T, P, S), X = T.
 reduit(simplify, X ?= T, P, S) :- suppr(X ?= T, P, S), X = T.
 reduit(expand, X ?= T, P, S) :- suppr(X ?= T, P, S), X = T.
-reduit(check, _, _, []) :- false.
 reduit(orient, T ?= X, P, S) :- suppr(T ?= X, P, S2), append([X ?= T], S2, S).
 reduit(decompose, F ?= G, P, S) :- 	F =.. Fliste, G =.. Gliste, 
 									suppr_T(Fliste, Freste), suppr_T(Gliste, Greste),
-									unif_list(Fliste, Gliste, L),
+									unif_list(Freste, Greste, L),
 									suppr(F ?= G, P, V),
 									append(L, V, S).
-
-
+reduit(check, _, _, []) :- false.
+reduit(clash, _, _, []) :- false.
+									
+% ---------------------------------------------------------------------------
+								
 % Question 2 : Definition des strategies
+
+% Definition du predicat unifie
+unifier([], _).
+unifier(P, Strategie) :-	choix(Strategie, P, E, R), 
+							afficher_trace(R, E, P),
+							reduit(R, E, P, Q), 
+							unifier(Q, Strategie), !.
+
+% Definition du predicat de choix de strategie
+choix(premier, P, E, R) :- choix_premier(P, E, R).
+choix(pondere, P, E, R) :- choix_pondere(P, E, R).
+
+% Definition de la liste ordonnee des regles representant l'echelle de poids
+echelle_poids([clash, check, rename, simplify, orient, decompose, expand]).
+
+% Definition du predicat trouver_equation qui se charge de trouver une equation sur laquelle on peut appliquer une regle, et d'y appliquer la regle correspondante
+trouver_equation([R|_], [E|_], E, R) :- regle(E, R).
+trouver_equation(X, [_|Q], E, R) :- trouver_equation(X, Q, E, R).
+trouver_equation(_, [], _, _) :- false.
+
+
+% Definition du predicat selectionner_regle qui se charge de trouver une regle applicable
+selectionner_regle(X, P, E, R) :- trouver_equation(X, P, E, R).
+selectionner_regle([_|Q], P, E, R) :- selectionner_regle(Q, P, E, R).
+
+
+% Definition de choix_premier et de choix_pondere.
+% Choix d'une equation E grâce et de la regle R correspondante
+choix_premier([E|_], E, R) :- regle(E, R), !.
+choix_pondere(P, E, R) :- echelle_poids(X), selectionner_regle(X, P, E, R), !.
+
+
+
+
+% ---------------------------------------------------------------------------
+
+% Predicats d'affichage 
+
+% menu : ce predicat va set_echo, puis echo un menu d'accueil
+menu :- 
+set_echo, nl,
+ansi_format([fg(blue)], '===============================================', []), nl,
+ansi_format([fg(red)], '   		MARTELLI - MONTANARI', []), nl,
+ansi_format([fg(red)], '   		UNIFICATION PROGRAM', []), nl, nl,
+ansi_format([fg(green)], 'Utilisation du programme : unifie(X)', []), nl,
+ansi_format([fg(green)], '(avec X liste d\'équations de la forme (F ?= G)', []), nl,
+ansi_format([fg(blue)], '===============================================', []), nl, nl.
+
+% afficher trace : affiche l'etat courant du programme
+afficher_trace(R, E, S) :-	echo('System : '), echo(S), nl,
+							echo(R), echo(' : '), echo(E), nl.
+		
+% affichage et choix de la strategie a appliquer
+% strategie premier par defaut
+unifie(P) :- 	echo('Choisissez une strategie : '), nl,
+				echo('(a) Premier'), nl,
+				echo('(b) Pondere'), nl,
+				read(numStrat), (numStrat == a -> Strategie = premier ;
+								numStrat == b -> Strategie = pondere;
+								Strategie = premier), 
+				ansi_format([fg(yellow)], 'Stratégie : ~w', [Strategie]), nl,				
+				
+				unifier(P, Strategie).
+		% echo('Strategie : '), echo(numStrat), nl,
+% ---------------------------------------------------------------------------
+							
+% init : sera éxécuté dès le lancement du programme
+init :- menu.
+
+:- init.
